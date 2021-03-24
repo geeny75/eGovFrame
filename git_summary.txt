@@ -1,0 +1,126 @@
+
+Git / github
+
+Terminalcommand 명령어
+Github Desktop 비추
+Sourcetree 
+GitKraken
+
+버전관리
+>> 로컬 저장소
+> git --version 
+  => git version 2.31.0.windows.1
+$ git init
+$ git config --global user.email jini98@hamail.net
+$ git config --global user.name geeny75
+$ git add pom.xml
+$ git commit -m 'Project Object Model'
+$ g
+$ git checkout 7자리id
+$ git checkout -  (최신 커밋)
+
+
+>>원격저장소
+$ git remote add origin https://GitHub.com/geeny75/RFMS.git
+$ git push origin master
+
+
+https://gmlwjd9405.github.io/2018/05/17/git-delete-incorrect-files.html
+
+
+http://localhost:34106/?state=authenticated&code=wBPjfj6DQs2Wsj5YHh
+
+git satus 에러코드 128로 실패함
+del .gitignore
+
+git reset
+
+https://geeny75.github.io/RFMS/
+.gitconfig  =>파일 
+$code .  => 비쥬얼스튜디오로 열기
+$ git config --list
+$ git config --global -e  ==> 터미멀에서 가능
+$ git config --global code.editor "code"
+$ git config --global code.editor "code--wait"
+$ git config --global user.name "geeny"
+$ git config --global user.email "geeny03@naver.com"
+git config user.email
+
+$ git config core.autocrlf true
+$ rm -rf .git             => 초기화
+$ git init  ==> 초기화
+$ echo hellow world! > a.txt
+$ git status
+$ git add * 
+$ git rm --cached *.*
+$ echo *.log .gitignore
+$ open .gitignore
+$ echo target/ >> .gitignore
+$ git status -h 
+$ git status -s
+$ git status -l
+
+$ git diff
+$ cat a.txt   ==> 파일 내용 보기
+$ git diff --staged
+or
+$ git diff --cached 
+나기기 ~~ > q
+
+$ git config --global -e
+
+$ git difftool --staged
+$ git commit -am "second commit"
+$ git status -s
+$ git pull origin master
+$ git push origin +master
+$ git add .  (로컬과 깃과 차이)
+
+diff.astextplain.textconv=astextplain
+filter.lfs.clean=git-lfs clean -- %f
+filter.lfs.smudge=git-lfs smudge -- %f
+filter.lfs.process=git-lfs filter-process
+filter.lfs.required=true
+http.sslbackend=openssl
+http.sslcainfo=D:/Git/mingw64/ssl/certs/ca-bundle.crt
+core.autocrlf=true
+core.fscache=true
+core.symlinks=false
+pull.rebase=false
+credential.helper=manager-core
+credential.https://dev.azure.com.usehttppath=true
+init.defaultbranch=master
+user.email=jini98@hamail.net
+user.name=geeny75
+core.repositoryformatversion=0
+core.filemode=false
+core.bare=false
+core.logallrefupdates=true
+core.symlinks=false
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*팝업 API 스크립트 시작*/
+function goPopupApi(){
+	var printType = $("input:radio[name=resultType]:checked").val();
+	var skinType = $("input:radio[name=resultSkin]:checked").val();
+	var confirmKey = $("#resultSkinConfmKey").val();
+	
+	if(skinType == '5' && (confirmKey == null || confirmKey == "")){
+		alert("승인키를 입력해주세요.");
+		$("#resultSkinConfmKey").focus();
+		return;
+	}
+	
+	var pop = window.open("/addrlink/AddrLinkPageLink.do?link=/addrlink/jusoPopupUse&printType="+printType+"&skinType="+skinType+"&confirmKey="+confirmKey,"pop","width=870,height=820, scrollbars=yes, resizable=yes");
+}
