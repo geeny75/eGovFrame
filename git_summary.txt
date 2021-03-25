@@ -20,6 +20,25 @@ $ git checkout 7자리id
 $ git checkout -  (최신 커밋)
 
 
+LDCC@PARKJINHEE MINGW64 /d/eGovFrameDev-3.10.0-64bit/workspace/RFMS (master)
+$ git push origin master
+
+To https://GitHub.com/geeny75/RFMS
+ ! [rejected]        master -> master (non-fast-forward)
+error: failed to push some refs to 'https://GitHub.com/geeny75/RFMS'
+hint: Updates were rejected because the tip of your current branch is behind
+hint: its remote counterpart. Integrate the remote changes (e.g.
+hint: 'git pull ...') before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+
+$ git pull --rebase
+error: cannot pull with rebase: You have unstaged changes.
+error: please commit or stash them.
+
+
+git push -f origin master
+
+
 >>원격저장소
 $ git remote add origin https://GitHub.com/geeny75/RFMS.git
 $ git push origin master
@@ -68,7 +87,7 @@ $ git diff --cached
 나기기 ~~ > q
 
 $ git config --global -e
-
+c
 $ git difftool --staged
 $ git commit -am "second commit"
 $ git status -s
@@ -100,15 +119,21 @@ core.symlinks=false
 
 
 
+$ git remote -v 
+$ git remote remove origin 
+$ git remote add origin "https://github.com/geeny75/RFMS.git"
+$ git pull oring master
 
 
+원격 저장소에서 잘못 올라간 파일을 삭제
+// .idea/modules.xml 파일 삭제
+$ git rm --cached .idea/modules.xml
+// .idea 폴더 하위의 모든 파일 삭제 
+$ git rm --cached -r .idea/
 
+https://gmlwjd9405.github.io/2018/05/17/git-delete-incorrect-files.html
 
-
-
-
-
-
+https://github.com/explore
 
 /*팝업 API 스크립트 시작*/
 function goPopupApi(){
