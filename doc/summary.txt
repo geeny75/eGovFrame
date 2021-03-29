@@ -1,0 +1,50 @@
+공공데이터 API
+
+코로나현황
+
+https://www.data.go.kr/data/15043376/openapi.do
+
+
+ http://openapi.data.go.kr/openapi/service/rest/Covid19/getCovid19InfStateJson
+
+ 
+ 
+ End Point	
+ http://openapi.data.go.kr/openapi/service/rest/Covid19
+API 환경 또는 API 호출 조건에 따라 인증키가 적용되는 방식이 다를 수 있습니다.
+포털에서 제공되는 Encoding/Decoding 된 인증키를 적용하면서 구동되는 키를 사용하시기 바랍니다.
+ 
+일반 인증키(Enecoding)	
+zZmvp8orLEvNI31rbrzuGVtdLvVZ3juLI%2BcH7%2BXyjpCuIqJeSzwN2gWYsf6KJ5AZVUxnjLN2sM24VcNfUsbwow%3D%3D
+일반 인증키(Decoding)	
+zZmvp8orLEvNI31rbrzuGVtdLvVZ3juLI+cH7+XyjpCuIqJeSzwN2gWYsf6KJ5AZVUxnjLN2sM24VcNfUsbwow==
+
+> 로그인 후 Service Key 발급 확인
+https://www.data.go.kr/iim/api/selectAPIAcountView.do
+
+
+http://openapi.data.go.kr/openapi/service/rest/Covid19/getCovid19InfStateJson?ServiceKey=zZmvp8orLEvNI31rbrzuGVtdLvVZ3juLI%2BcH7%2BXyjpCuIqJeSzwN2gWYsf6KJ5AZVUxnjLN2sM24VcNfUsbwow%3D%3D&pageNo=1&numOfRows=10&startCreateDt=20210329&endCreateDt=20210329
+
+http://openapi.data.go.kr/openapi/service/rest/Covid19/getCovid19InfStateJson?ServiceKey=zZmvp8orLEvNI31rbrzuGVtdLvVZ3juLI+cH7+XyjpCuIqJeSzwN2gWYsf6KJ5AZVUxnjLN2sM24VcNfUsbwow==&pageNo=1&numOfRows=10&startCreateDt=20210329&endCreateDt=20210329
+
+
+'http://localhost:8080' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+curl -H "origin: example.com" -v "https://www.anything.net/video/call/System.generateId.dwr"
+
+<response>
+<header>
+<resultCode>99</resultCode>
+<resultMsg>SERVICE KEY IS NOT REGISTERED ERROR.</resultMsg>
+</header>
+</response>
+
+
+
+좌표 API
+
+출처 https://www.juso.go.kr/addrlink/devAddrLinkRequestSubmit.do
+localhost:8080
+devU01TX0FVVEgyMDIxMDMyOTEzMjgxNjExMDk3ODQ=
+개발 ( 사용기간 : 2021-03-29 ~ 2021-06-27 )
+
+

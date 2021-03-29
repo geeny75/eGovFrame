@@ -1,0 +1,12 @@
+
+
+{"name":"보건복지부_코로나19 감염_현황",
+"description":"코로나19감염증으로 인한 일별 확진자,완치자,지료중인환자,사망자등에 대한 현황자료(이 제공자료는 관련 발생 상황에 대한 정보를 신속 투명하게 공개하기 위한 것으로, 추가적인 역학조사 결과 등에 따라 수정 및 보완될 수 있음을 알려드립니다.)",
+"url":"https://www.data.go.kr/data/15043376/openapi.do",
+"keywords":["코로나,호흡기질환,건강"],
+"license":"https://data.go.kr/ugs/selectPortalPolicyView.do",
+"creator":{"name":"공공데이터활용지원센터","contactPoint":{"contactType":"공공데이터활용지원센터","telephone":"+82-0215660025","@type":"ContactPoint"},"@type":"Organization"},
+"distribution":[{"encodingFormat":"XML","contentUrl":"https://www.data.go.kr/data/15043376/openapi.do","@type":"DataDownload"}],
+"@context":"https://schema.org",
+"@type":"Dataset"
+}

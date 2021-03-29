@@ -189,7 +189,7 @@
 				</ol>
 			</div>
 			<div id="banner_div">
-			    <div class="bnpadtop">링크</div>
+			    <div class="bnpadtop"> <a href="http://ncov.mohw.go.kr/">코로나19 현황<></div>
 				<div class="bnpadding"><a href="http://www.mois.go.kr/" target="_blank"><img src="<c:url value='/'/>images/header/banner_mois.png" alt="행정안전부" /></a></div>
 				<div class="bnpadding"><a href="http://www.nia.or.kr/" target="_blank"><img src="<c:url value='/'/>images/header/banner_nia.png" alt="한국정보화진흥원" /></a></div>
 				<div class="bnpadding"><a href="http://www.egovframe.go.kr/" target="_blank"><img src="<c:url value='/'/>images/header/banner_egovportal.gif" alt="전자정부표준프레임워크 포털" /></a></div>
