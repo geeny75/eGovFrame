@@ -1,0 +1,20 @@
+<bean>
+	class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+	<property name="webBindingInitializer">
+		<bean class="egovframework.example.cmmn.web.EgovBindingInitializer" />
+	</property>
+	<property name="messageConverters">
+		<list>
+			<bean class="org.springframework.http.converter.StringHttpMessageConverter">
+				<property name="supportedMediaTypes">
+					<list>
+						<value>text/html;charset=UTF-8</value>
+						<value>application/json;charset=UTF-8</value>
+					</list>
+				</property>
+			</bean>
+			<bean
+		   class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter" />
+		</list>
+	</property>
+</bean>
