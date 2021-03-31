@@ -18,11 +18,161 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<!--※ proj4.js 파일경로를 찾지 못함  -->
+<!--  <script type="text/javascript" src="<c:url value="/js/proj4.js" />" ></script>  -->
+<script src="http://code.jquery.com/jquery-latest.js"></script> 
+<script src="http://code.jquery.com/jquery-latest.min.js"></script> 
 <meta http-equiv="content-language" content="ko">
-<title>경량환경 템플릿 포털사이트</title>
+<title>eGovFrame 포털사이트</title>
 <link href="<c:url value='/'/>css/default.css" rel="stylesheet" type="text/css" >
+
 </head>
 <body>
+
+<script type="text/javascript">
+	/*코로나19 현황 공공데이터 API 호출(크로스도메인으로 인한 jsonp 이용)*/
+	function fCovid19InfStateJson(){  
+		var todayCnt = "-";
+		var totCnt = "-";
+		var url =  "/pst_webapp" + "/cmm/main/getCovid19InfStateJson.do"	;
+		console.log( "Start - fCovid19InfStateJson (jsp) \n"  + url);
+		$.ajax({
+			url: url
+			,type:"GET" 
+			,headers: {
+				    'Authorization': '(redacted)',
+				    'Access-Control-Allow-Origin': '*' 
+			}
+		//	,dataType:"jsonp"											// 크로스도메인으로 인한 jsonp 이용, 검색결과형식 JSON 
+			,dataType:"json"											// 크로스도메인으로 인한 jsonp 이용, 검색결과형식 JSON 
+			,crossDomain:true
+			,contentType: 'application/json;charset=UTF-8' 
+			//,contentType: 'json' 
+			,success:function(jsonStr){		
+				//alert('success');// jsonStr :   검색 결과 JSON 데이터		
+				//alert(jsonStr);
+				const obj = JSON.parse(jsonStr)
+				console.log(" \n==========결과 =========(In Jsp)===json :"+ jsonStr);
+				console.log(" \n== obj  :"+ obj);
+				todayCnt = obj.todayCnt;
+				totCnt = obj.totCnt;
+				  
+			  /*
+				var errCode = jsonStr.results.common.errorCode;
+				var errDesc = jsonStr.results.common.errorMessage;
+				if(errCode != "0"){ 
+					alert(errCode+"="+errDesc);
+				}else{
+					if(jsonStr!= null){						// 결과 JSON 데이터 파싱 및 출력
+						$(jsonStr.results).each(function(){
+							
+						}
+					}
+				} */
+			}
+			,error: function(xhr,status, error){
+				//alert("에러발생");										// AJAX 호출 에러
+				console.log("에러발생 \n status : "+status + "\n error : " +  error);	
+			},
+		    complete: function(data) {
+		     // alert('complete')
+		     console.log("complete \n"+data +"\n------------------");
+		    }
+		    
+		}); 
+		//alert(document.getElementById("todayCnt").innerHTML );  
+		
+		document.getElementById("todayCnt").innerHTML = todayCnt;
+		//document.getElementById("domesticCnt").innerHTML = 1;
+		//document.getElementById("overseasCnt").innerHTML = 1; 
+		
+		console.log( "End (jsp)" );
+	}
+	/*  공공API를 이용한  좌표 얻기*/
+	function fGetCoordinate(){ 
+		// AJAX 좌표 검색 요청
+		$.ajax({
+			url:"https://www.juso.go.kr/addrlink/addrCoordApiJsonp.do"	// 좌표검색 OPEN API URL
+			,type:"post"
+			,data:$("#form").serialize() 								// 요청 변수 설정
+			,dataType:"jsonp"											// 크로스도메인으로 인한 jsonp 이용, 검색결과형식 JSON 
+			,crossDomain:true
+			,success:function(jsonStr){									// jsonStr : 주소 검색 결과 JSON 데이터			
+				$("#list").html("");									// 결과 출력 영역 초기화
+				var errCode = jsonStr.results.common.errorCode;
+				var errDesc = jsonStr.results.common.errorMessage;
+				
+				console.log(errCode + " : " + errDesc);
+				
+				if(errCode != "0"){ 
+					alert(errCode+"="+errDesc);
+				}else{
+					if(jsonStr!= null){
+						console.log("jsonStr : "+ jsonStr);
+						makeListJson(jsonStr);							// 결과 JSON 데이터 파싱 및 출력
+					}
+				}
+			}
+			,error: function(xhr,status, error){
+				alert("에러발생");										// AJAX 호출 에러
+			}
+			 
+		});
+		 
+	}
+
+	function makeListJson(jsonStr){
+		var htmlStr = "";
+		htmlStr += "<table>";
+		// jquery를 이용한 JSON 결과 데이터 파싱
+		$(jsonStr.results.juso).each(function(){
+			 
+			var grs80 = proj4('+proj=tmerc +lat_0=38 +lon_0=127.5 +k=0.9996 +x_0=1000000 +y_0=2000000 +ellps=GRS80 +units=m +no_defs');
+			var wgs84 = proj4('+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs');
+
+			console.log(grs80);
+			console.log(wgs84);
+			// 네이버 맵에서 사용가능한 좌표. p[1] => lat, p[0] => lng 위도/경도 유형: WG84 ,  X/Y 좌표 유형: UTM-K (GRS80)
+			var p = proj4(grs80, wgs84, [Number(this.entX), Number(this.entY)]); 
+
+			document.getElementById("latitude").innerHTML = p[0];
+			document.getElementById("latitude").innerHTML =  p[1];
+			document.getElementById("tm").innerHTML= this.entX;
+			document.getElementById("tmY").innerHTML= this.entY;
+			 	
+	 
+			htmlStr += "<tr>";
+			htmlStr += "<td>"+this.admCd+"</td>";
+			htmlStr += "<td>"+this.rnMgtSn+"</td>";
+			htmlStr += "<td>"+this.udrtYn+"</td>";
+			htmlStr += "<td>"+this.buldMnnm+"</td>";
+			htmlStr += "<td>"+this.buldSlno+"</td>";
+			htmlStr += "<td>"+this.bdMgtSn+"</td>";
+			htmlStr += "<td>"+this.entX+"</td>";
+			htmlStr += "<td>"+this.entY+"</td>";
+			htmlStr += "<td>"+this.bdNm+"</td>";
+			htmlStr += "</tr>";
+		});
+		htmlStr += "</table>";
+		// 결과 HTML을 FORM의 결과 출력 DIV에 삽입
+		$("#list").html(htmlStr);
+		console.log("\n======================결과==============\n" + htmlStr);
+	}	
+
+	
+	window.onload = function(){  
+		
+
+		var roadAddr = "서울 금천구 가산디지털2로 179";
+		document.getElementById("roadAddr").innerHTML = roadAddr;
+		
+		
+	//	fGetCoordinate(); 
+		
+		fCovid19InfStateJson(); 
+	} 
+	
+</script>
 <noscript><p>자바스크립트를 지원하지 않는 브라우저에서는 일부 기능을 사용하실 수 없습니다.</p></noscript>
 <!-- login status start -->
 <div id="login_area"><c:import url="/EgovPageLink.do?link=main/inc/EgovIncTborder" /></div>
@@ -189,14 +339,39 @@
 				</ol>
 			</div>
 			<div id="banner_div">
-			    <div class="bnpadtop"> <a href="http://ncov.mohw.go.kr/">코로나19 현황<></div>
-				<div class="bnpadding"><a href="http://www.mois.go.kr/" target="_blank"><img src="<c:url value='/'/>images/header/banner_mois.png" alt="행정안전부" /></a></div>
+			    <div class="bnpadtop"> 
+				    <H4></H4><a href="http://ncov.mohw.go.kr/" target="_blank" >코로나19 현황</a></H4>
+				    <UL> 
+				    	<li>일일 : <p id="todayCnt" name ="todayCnt"></p></li> 
+				    </UL>
+			    </div>
+				<div class="bnpadding">
+				 	<H4></H4><a href="https://www.juso.go.kr/addrlink/main.do?cPath=99JM" target="_blank"  title="도로명주소 개발자 센터">현재위치</a></H4>
+				    <UL> 
+				    	<li>도로명주소 : <span id="roadAddr" name="roadAddr" ></span></li>
+				    	<li>위경도 좌표 : <span id="tmX" name="tmX" ></span>,<span id="tmY" name="tmY" ></span></li>
+				    	<li>TM 좌표 : <span id="latitude" name="latitude" ></span>, <span id="longitude" name=""longitude ></span></li>
+				    </UL> 
+				</div>
 				<div class="bnpadding"><a href="http://www.nia.or.kr/" target="_blank"><img src="<c:url value='/'/>images/header/banner_nia.png" alt="한국정보화진흥원" /></a></div>
 				<div class="bnpadding"><a href="http://www.egovframe.go.kr/" target="_blank"><img src="<c:url value='/'/>images/header/banner_egovportal.gif" alt="전자정부표준프레임워크 포털" /></a></div>
 				<div class="bnpadding"><a href="http://open.egovframe.go.kr/" target="_blank"><img src="<c:url value='/'/>images/header/banner_opencmm.gif" alt="오픈커뮤니티" /></a></div>
 			</div>
+			
 		</div>
 	</div>
+	
+	<form name="form" id="form" method="post">
+		<input type="text" name="confmKey" value="devU01TX0FVVEgyMDIxMDMyOTEzMjgxNjExMDk3ODQ="/><!-- 요청 변수 설정 (승인키) -->
+		<input type="text" name="resultType" value="json"/> <!-- 요청 변수 설정 (검색결과형식 설정, json) --> 
+		<input type="text" name="admCd"   value="1154510100"/> <!-- 요청 변수 설정 (행정구역코드) 금천구     -->  	
+		<input type="text" name="rnMgtSn" value="115453117002"/><!-- 요청 변수 설정 (도로명코드) --> 
+		<input type="text" name="udrtYn" value="0"/> <!-- 요청 변수 설정 (지하여부) -->
+		<input type="text" name="buldMnnm" value="179"/><!-- 요청 변수 설정 (건물본번) --> 
+		<input type="text" name="buldSlno" value="0"/><!-- 요청 변수 설정 (건물부번) -->
+		<input type="button" onClick="fGetCoordinate();" value="좌표검색하기"/>
+		<div id="list" ></div><!-- 검색 결과 리스트 출력 영역 -->	
+	</form>
 	<!-- footer 시작 -->
 	<div id="footer"><c:import url="/EgovPageLink.do?link=main/inc/EgovIncFooter" /></div>
 	<!-- //footer 끝 -->

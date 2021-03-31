@@ -17,6 +17,7 @@ import egovframework.rte.ptl.mvc.tags.ui.pagination.PaginationInfo;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -25,8 +26,31 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
+/*코로나19현황 공공API 호출 2021.3.30 (Tue)*/
 import java.net.URLEncoder;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.StringReader;
+import java.io.IOException;
+import java.util.Calendar;
+import java.text.SimpleDateFormat;
+//import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+/* XML Parser*/
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.json.simple.JSONObject;
 /**
  * 템플릿 메인 페이지 컨트롤러 클래스(Sample 소스)
  * @author 실행환경 개발팀 JJY
@@ -243,31 +267,39 @@ public class EgovMainController {
      * @return  
      * @exception 
      */
- /*   
+    @ResponseBody
+    @RequestMapping(value="/cmm/main/getCovid19InfStateJson.do", method = RequestMethod.GET)
+   // 
+    public   void getCovid19InfStateJson(HttpServletRequest request, HttpServletResponse response, ModelMap model) throws IOException  {
+    	System.out.println("Start getCovid19InfStateJson ( In Java) ");
+    	String serviceKeyEn = "zZmvp8orLEvNI31rbrzuGVtdLvVZ3juLI%2BcH7%2BXyjpCuIqJeSzwN2gWYsf6KJ5AZVUxnjLN2sM24VcNfUsbwow%3D%3D"; 
+		String serviceKey = "zZmvp8orLEvNI31rbrzuGVtdLvVZ3juLI+cH7+XyjpCuIqJeSzwN2gWYsf6KJ5AZVUxnjLN2sM24VcNfUsbwow==";
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        Calendar c1 = Calendar.getInstance();
+         
+        String strToday = sdf.format(c1.getTime()); 
 
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+        c1.add(Calendar.DATE, -1); // 오늘날짜로부터 -1 
 
-import java.io.BufferedReader;
-import java.io.IOException;
-*/
-    @RequestMapping(value="/getCovid19InfStateJson.do")
-    public String getCovid19InfStateJson(String[] args) {
+        String yesterDay = sdf.format(c1.getTime()); // String으로 저장
+        
+        String todayCnt = "-";
+
         StringBuilder urlBuilder = new StringBuilder("http://openapi.data.go.kr/openapi/service/rest/Covid19/getCovid19InfStateJson"); /*URL*/
-        urlBuilder.append("?" + URLEncoder.encode("ServiceKey","UTF-8") + "=서비스키"); /*Service Key*/
+        urlBuilder.append("?" + URLEncoder.encode("ServiceKey","UTF-8") + "=" +  serviceKeyEn) ; 
         urlBuilder.append("&" + URLEncoder.encode("ServiceKey","UTF-8") + "=" + URLEncoder.encode("-", "UTF-8")); /*공공데이터포털에서 받은 인증키*/
-        urlBuilder.append("&" + URLEncoder.encode("pageNo","UTF-8") + "=" + URLEncoder.encode("1", "UTF-8")); /*페이지번호*/
-        urlBuilder.append("&" + URLEncoder.encode("numOfRows","UTF-8") + "=" + URLEncoder.encode("10", "UTF-8")); /*한 페이지 결과 수*/
-        urlBuilder.append("&" + URLEncoder.encode("startCreateDt","UTF-8") + "=" + URLEncoder.encode("20200310", "UTF-8")); /*검색할 생성일 범위의 시작*/
-        urlBuilder.append("&" + URLEncoder.encode("endCreateDt","UTF-8") + "=" + URLEncoder.encode("20200315", "UTF-8")); /*검색할 생성일 범위의 종료*/
+        urlBuilder.append("&" + URLEncoder.encode("pageNo","UTF-8")     + "=" + URLEncoder.encode("1", "UTF-8")); /*페이지번호*/
+        urlBuilder.append("&" + URLEncoder.encode("numOfRows","UTF-8")  + "=" + URLEncoder.encode("10", "UTF-8")); /*한 페이지 결과 수*/
+        urlBuilder.append("&" + URLEncoder.encode("startCreateDt","UTF-8") + "=" + URLEncoder.encode(yesterDay, "UTF-8")); /*검색할 생성일 범위의 시작*/
+        urlBuilder.append("&" + URLEncoder.encode("endCreateDt","UTF-8") + "=" + URLEncoder.encode(strToday, "UTF-8")); /*검색할 생성일 범위의 종료*/
+        
         URL url = new URL(urlBuilder.toString());
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
         conn.setRequestProperty("Content-type", "application/json");
         System.out.println("Response code: " + conn.getResponseCode());
         BufferedReader rd;
-        if(conn.getResponseCode() >= 200 && conn.getResponseCode() <= 300) {
+        if(conn.getResponseCode() >= HttpURLConnection.HTTP_OK  && conn.getResponseCode() <= 300) {
             rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
         } else {
             rd = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
@@ -278,9 +310,123 @@ import java.io.IOException;
             sb.append(line);
         }
         rd.close();
-        conn.disconnect();
-        System.out.println(sb.toString());
-        
-        return "";
+        conn.disconnect();  	 
+        JSONObject jsonObj = new JSONObject();
+        if( sb.length() > 0 ) {
+        	jsonObj = fXMLParser(sb);
+        	
+        } 
+		
+      //  resultCode
+       // resultMsg
+        //DECIDE_CNT todayCnt
+        model.addAttribute("result", jsonObj);
+   //     model.addAttribute("domesticCnt", 1);
+   //     model.addAttribute("overseasCnt", 1); 
+        System.out.println("End (In Java)"); 
+        return ;
     } 
+    // tag값의 정보를 가져오는 메소드
+   	private static String getTagValue(String tag, Element eElement) {
+   	    NodeList nlList = eElement.getElementsByTagName(tag).item(0).getChildNodes();
+   	    Node nValue = (Node) nlList.item(0);
+   	    if(nValue == null) 
+   	        return null;
+   	    return nValue.getNodeValue();
+   	}
+   	/* fXMLParser
+   	 * XML 형식 문자열 Parsing
+   	 * 출처 : https://shonm.tistory.com/126
+   	 * */
+
+   	public JSONObject fXMLParser(StringBuilder sb) { 
+   		String todayCnt ="";
+   		int decideCnt[] = {0, 0, 0};
+   		System.out.println(" \n==========fXMLParser ====(In Java)=================\n"+  sb.toString()); 
+   		
+   		try{ 
+   				// parsing할 url 지정(API 키 포함해서)
+   				
+   				DocumentBuilderFactory dbFactoty = DocumentBuilderFactory.newInstance();
+   				DocumentBuilder dBuilder = dbFactoty.newDocumentBuilder();
+   				Document doc = dBuilder.parse(new InputSource(new StringReader(sb.toString())));  //dBuilder.parse(sb.toString());
+   				
+   				NodeList resultCodeList    =  doc.getElementsByTagName("resultCode");
+   				NodeList resultMsgList     =  doc.getElementsByTagName("resultMsg"); 
+
+   				Node resultCodeNode      =  resultCodeList.item(0);//첫번째 element 얻기
+   				Node resultMsgNode       =  resultMsgList.item(0);//첫번째 element 얻기
+   				
+   			    Node resultCodeText     =  resultCodeNode.getChildNodes().item(0);
+   			    Node resultMsgText      =  resultMsgNode.getChildNodes().item(0);
+   			    
+   			    String resultCode = resultCodeText.getNodeValue(); 
+			    String resultMsg = resultMsgText.getNodeValue(); 
+			    
+			    System.out.println("resultCode : " + resultCode + "\nresultMsg : " + resultMsg );
+			    
+			    if( "00".equals(resultCode) == true ) { 
+	   			 	NodeList decideCntList     =  doc.getElementsByTagName("decideCnt");
+	   			 	int len = decideCntList.getLength();
+	   			 		
+	   			 	 
+	   			 	for( int ix =0 ; ix <len && ix < 3 ; ix++) {
+	   			 
+		   			 	Node decideCntNode       =  decideCntList.item(ix);//첫번째 element 얻기
+		   				Node decideCntText      =  decideCntNode.getChildNodes().item(0);
+		   			   //element의 text 얻기   			   
+	   			    
+		   				decideCnt[ix] = Integer.parseInt(decideCntText.getNodeValue());  
+	   			 	}
+	   			 	decideCnt[2] =   decideCnt[0] - decideCnt[1] ;
+	   			 	System.out.println("decideCnt[0] : " + decideCnt[0] + "\ndecideCnt[1] : " + decideCnt[1] );
+   			    	System.out.println("확진자 수  : " + decideCnt[2]); 
+			    }
+   			 
+   				/* root tag 
+   				Element eElement1  = doc.getDocumentElement();
+   				eElement1.normalize();
+   				System.out.println("Root element :" + eElement1.getNodeName());
+   				//eElement1.getTagName()
+   				String resultCode = eElement1.getAttribute("resultCode");
+   				String resultMsg = eElement1.getAttribute("resultMsg");
+   				
+   				//String resultCode = getTagValue("resultCode",eElement1);
+   				//String resultMsg = getTagValue("resultMsg",eElement1);
+   				*/
+   				
+   				
+   				// 파싱할 tag
+   				/*
+   				NodeList nList = doc.getElementsByTagName("item");
+   				//System.out.println("파싱할 리스트 수 : "+ nList.getLength());
+   				
+   				for(int temp = 0; temp < nList.getLength(); temp++){
+   					Node nNode = nList.item(temp);
+   					if(nNode.getNodeType() == Node.ELEMENT_NODE){
+   						
+   						Element eElement = (Element) nNode;
+   						System.out.println("######################");
+   						//System.out.println(eElement.getTextContent());
+   						todayCnt = getTagValue("decideCnt", eElement);
+   						System.out.println("확진자 수  : " + todayCnt); 
+   					}	// for end
+   				}	// if end
+   				
+   			  */
+   			
+   		} catch (Exception e){	
+   			e.printStackTrace();
+   		}	// try~catch end
+   		
+   	 
+		JSONObject jsonObj = new JSONObject(); 
+		
+		jsonObj.put("todayCnt",Integer.toString( decideCnt[2]) );
+		jsonObj.put("totCnt",Integer.toString(decideCnt[0]));
+		String data = jsonObj.toString();
+		System.out.println("json data ==> " + data);
+		
+   		return jsonObj;
+   	}	 
 }
